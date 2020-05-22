@@ -1,34 +1,36 @@
 package po83.dunaeva.oop.model;
 
 public class Service {
+    private String DEFAULT_NAME = "интернет 100мб\\сек";
+    private double DEFAULT_COST = 300;
     private String name;
-    private int price;
+    private double cost;
 
-    public Service()
-    {
-        name = "интернет 100мб\\сек";
-        price = 300;
+
+    public Service() {
+        name = DEFAULT_NAME;
+        cost = DEFAULT_COST;
     }
 
-    public Service(String name, int price)
-    {
+    public Service(String name, long cost) {
         this.name = name;
-        this.price = price;
+        this.cost = cost;
+    }
+
+
+    public String getName() {
+        return name;
+
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setPrice(int price) {
-        this.price = price;
+    public double getCost() {
+        return cost;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
+    public void setCost(double cost) {
+        this.cost = cost;
 }
