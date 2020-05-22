@@ -20,6 +20,7 @@ public class Service {
 
     public String getName() {
         return name;
+
     }
 
     public void setName(String name) {
@@ -32,5 +33,4 @@ public class Service {
 
     public void setCost(double cost) {
         this.cost = cost;
-    }
 }
