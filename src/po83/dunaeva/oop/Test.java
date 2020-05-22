@@ -81,6 +81,4 @@ public class Test {
         System.out.println(a2.getNumber()+" "+a2.getPerson().getFirstName()+" "+a2.getTariff().size());
 
     }
-
-
 }
