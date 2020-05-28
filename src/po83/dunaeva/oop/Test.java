@@ -17,8 +17,8 @@ public class Test {
 
         Service s1 = new Service();
         Service s2 = new Service("интернет 150мб\\сек", 400, ServiceTypes.PHONE);
-        System.out.println(s1.getName() + " " + s1.getCost() + s1.getServiceType());
-        System.out.println(s2.getName() + " " + s2.getCost() + s2.getServiceType());
+        System.out.println(s1.getName() + " " + s1.getCost() + " " + s1.getServiceType());
+        System.out.println(s2.getName() + " " + s2.getCost() + " " + s2.getServiceType());
 
         Service[] services = new Service[3];
         services[0] = s1;
@@ -119,6 +119,8 @@ public class Test {
 
         System.out.println();
 
+        accountsManager.add(new EntityAccount(3, "Точно не Грут"));
+
         Account[] accounts;
 
         accounts = accountsManager.getAccounts();
@@ -131,7 +133,6 @@ public class Test {
         }
 
         System.out.println();
-        accountsManager.add(new EntityAccount(3, "Точно не Грут"));
 
         accounts = accountsManager.getEntityAccounts();
         for (int i = 0; i < accounts.length; i++) {

@@ -7,7 +7,7 @@ public class EntityAccount extends AbstractAccount {
         super(number, null);
         this.name = name;
 
-        Tariff tariff = new IndividualsTariff();
+        Tariff tariff = new EntityTariff();
         tariff.add(new Service("интернет 100мб\\сек", 300, ServiceTypes.INTERNET));
         setTariff(tariff);
     }
