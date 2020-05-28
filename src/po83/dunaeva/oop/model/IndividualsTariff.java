@@ -1,32 +1,30 @@
 package po83.dunaeva.oop.model;
 
-
-
-public class IndividualsTariff {
+public class IndividualsTariff implements Tariff{
     private int DEFAULT_SIZE = 8;
     private Service[] services;
     private int size;
 
     public IndividualsTariff() {
-        size= DEFAULT_SIZE;
+        size = DEFAULT_SIZE;
         services = new Service[size];
     }
 
     public IndividualsTariff(int size) {
-        this.size=size;
+        this.size = size;
         services = new Service[size];
     }
 
     public IndividualsTariff(Service[] services) {
-        size=services.length;
-        this.services=new Service[size()];
-        System.arraycopy(services,0,this.services,0, size());
+        size = services.length;
+        this.services = new Service[size()];
+        System.arraycopy(services, 0, this.services, 0, size());
     }
 
-       public boolean add(Service service) {
-        for (int i=0;i<size();i++){
-            if (services[i]==null) {
-                services[i]=service;
+    public boolean add(Service service) {
+        for (int i = 0; i < size(); i++) {
+            if (services[i] == null) {
+                services[i] = service;
                 return true;
             }
         }
@@ -49,8 +47,8 @@ public class IndividualsTariff {
     }
 
     public Service get(String serviceName) {
-        for (int i=0; i<size; i++) {
-            if (services[i]!=null) {
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
                 if (services[i].getName().equals(serviceName)) {
                     return services[i];
                 }
@@ -59,10 +57,40 @@ public class IndividualsTariff {
         return null;
     }
 
-    public boolean serviceIsExists(String serviceName) {
-        for (int i=0; i<size; i++) {
-            if (services[i].getName().equals(serviceName)) {
-                return true;
+    @Override
+    public Service[] getServices(ServiceTypes serviceType) {
+        int newSize = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].getServiceType() == serviceType) {
+                    newSize++;
+                }
+            }
+        }
+
+        Service[] result = new Service[newSize];
+
+        int destinationIndex = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].getServiceType() == serviceType) {
+                    result[destinationIndex] = services[i];
+                    destinationIndex++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public boolean hasService(String serviceName) {
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].getName().equals(serviceName)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -76,15 +104,17 @@ public class IndividualsTariff {
 
     public Service remove(int index) {
         Service removedService = services[index];
-        System.arraycopy(services,index,services,index+1,size-index-1);
-        services[size-index-1]=null;
+        System.arraycopy(services, index + 1, services, index, size - index - 1);
+        services[size - index - 1] = null;
         return removedService;
     }
 
     public Service remove(String serviceName) {
         for (int i = 0; i < size; i++) {
-            if (services[i].getName().equals(serviceName)) {
-                return remove(i);
+            if (services[i] != null) {
+                if (services[i].getName().equals(serviceName)) {
+                    return remove(i);
+                }
             }
         }
         return null;
@@ -95,15 +125,15 @@ public class IndividualsTariff {
     }
 
     public Service[] getServices() {
-        Service[] result=new Service[size()];
-        System.arraycopy(services,0,result,0, size());
+        Service[] result = new Service[size()];
+        System.arraycopy(services, 0, result, 0, size());
         return result;
     }
 
-    public Service[] sortedServicesByCost(){
-        Service[] result=new Service[size()];
-        System.arraycopy(services,0,result,0, size());
-        boolean isSorted=false;
+    public Service[] sortedServicesByCost() {
+        Service[] result = new Service[size()];
+        System.arraycopy(services, 0, result, 0, size());
+        boolean isSorted = false;
         Service buffer;
         while (!isSorted) {
             isSorted = true;
@@ -122,10 +152,22 @@ public class IndividualsTariff {
         return result;
     }
 
-    private void doubleArraySize(){
-        Service[] result=new Service[size()*2];
-        System.arraycopy( services,0,result,0, size());
-        size*=2;
-        services=result;
+    public double cost() {
+        double result = 0;
+
+        for (int i = 0; i < size; ++i) {
+            if (services[i] != null) {
+                result += services[i].getCost();
+            }
+        }
+
+        return result;
+    }
+
+    private void doubleArraySize() {
+        Service[] result = new Service[size() * 2];
+        System.arraycopy(services, 0, result, 0, size());
+        size *= 2;
+        services = result;
     }
 }
