@@ -21,4 +21,27 @@ public class Person {
     public String getSecondName() {
         return secondName;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s", firstName, secondName);
+    }
+
+    @Override
+    public int hashCode() {
+        return firstName.hashCode() * secondName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (this.getClass() == o.getClass()) {
+            return firstName.equals(((Person) o).getFirstName()) && secondName.equals(((Person) o).getSecondName());
+        } else {
+            return false;
+        }
+    }
 }

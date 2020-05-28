@@ -24,4 +24,19 @@ public class EntityAccount extends AbstractAccount {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Entity account:\nentity: %s\n%s", name, super.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return 53 ^ super.hashCode() ^ name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && name.equals(((EntityAccount)o).getName());
+    }
 }

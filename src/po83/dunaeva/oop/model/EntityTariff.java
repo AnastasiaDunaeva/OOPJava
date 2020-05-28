@@ -1,6 +1,6 @@
 package po83.dunaeva.oop.model;
 
-public class EntityTariff implements Tariff {
+public class EntityTariff implements Tariff, Cloneable {
     private Node head, tail;
     private int size;
 
@@ -192,6 +192,53 @@ public class EntityTariff implements Tariff {
     }
 
     @Override
+    public boolean remove(Service service) {
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            current = current.next;
+            if (current.getValue() != null) {
+                if (current.getValue().equals(service)) {
+                    current.previous.next = current.next;
+                    current.next.previous = current.previous;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int indexOf(Service service) {
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            current = current.next;
+            if (current.getValue() != null) {
+                if (current.getValue().equals(service)) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Service service) {
+        Node current = tail;
+        for (int i = size - 1; i >= 0; i--) {
+            current = current.previous;
+            if (current.getValue() != null) {
+                if (current.getValue().equals(service)) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
     public int size() {
         return size;
     }
@@ -289,5 +336,68 @@ public class EntityTariff implements Tariff {
         public Service getValue() {
             return value;
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("services:");
+        for (int i = 0; i < size; i++) {
+            if (get(i) != null) {
+                result.append(String.format("\n%s", get(i)));
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 71;
+        for (int i = 0; i < size; i++) {
+            if (get(i) != null) {
+                result ^= get(i).hashCode();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (this.getClass() == o.getClass()) {
+            EntityTariff tariff = (EntityTariff) o;
+
+            boolean ok;
+            for (int i = 0; i < size; i++) {
+                ok = false;
+                for (int j = 0; j < tariff.size(); j++) {
+                    if (get(i) == null) {
+                        if (tariff.get(j) == null) {
+                            ok = true;
+                            break;
+                        }
+                    } else if (get(i).equals(tariff.get(j))) {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if (!ok) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Tariff clone() throws CloneNotSupportedException {
+        return new EntityTariff(getServices());
     }
 }

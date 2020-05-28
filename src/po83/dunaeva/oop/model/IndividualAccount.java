@@ -24,4 +24,19 @@ public class IndividualAccount extends AbstractAccount {
     public void setPerson(Person person) {
         this.person = person;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Entity account:\nholder: %s\n%s", person.toString(), super.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return 97 ^ super.hashCode() ^ person.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && person.equals(((IndividualAccount)o).getPerson());
+    }
 }

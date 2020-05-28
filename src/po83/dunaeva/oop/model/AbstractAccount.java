@@ -23,4 +23,28 @@ public abstract class AbstractAccount implements Account {
     public void setTariff(Tariff tariff) {
         this.tariff = tariff;
     }
+
+    @Override
+    public String toString() {
+        return String.format("number: %d\n%s", number, tariff.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(number) * tariff.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (this.getClass() == o.getClass()) {
+            AbstractAccount account = (AbstractAccount) o;
+            return (number == account.number && tariff.size() == account.tariff.size() && tariff.equals(account.getTariff()));
+        } else {
+            return false;
+        }
+    }
 }

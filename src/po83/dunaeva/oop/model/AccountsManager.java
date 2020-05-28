@@ -1,5 +1,7 @@
 package po83.dunaeva.oop.model;
 
+import java.util.Arrays;
+
 public class AccountsManager {
     private int DEFAULT_SIZE = 8;
     private Account[] accounts;
@@ -96,8 +98,7 @@ public class AccountsManager {
         return result;
     }
 
-    public Account[] getAccounts(ServiceTypes serviceType)
-    {
+    public Account[] getAccounts(ServiceTypes serviceType) {
         int newSize = 0;
 
         for (int i = 0; i < size; i++) {
@@ -140,8 +141,7 @@ public class AccountsManager {
         return result;
     }
 
-    public Account[] getIndividualAccounts()
-    {
+    public Account[] getIndividualAccounts() {
         int newSize = 0;
 
         for (int i = 0; i < size; i++) {
@@ -168,8 +168,7 @@ public class AccountsManager {
         return result;
     }
 
-    public Account[] getEntityAccounts()
-    {
+    public Account[] getEntityAccounts() {
         int newSize = 0;
 
         for (int i = 0; i < size; i++) {
@@ -226,5 +225,43 @@ public class AccountsManager {
         System.arraycopy(accounts, 0, result, 0, size());
         size *= 2;
         accounts = result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                result.append(accounts[i].toString());
+            }
+        }
+        return result.toString();
+    }
+
+    public boolean remove(Account account) {
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] == null) {
+                if (account == null) {
+                    return true;
+                }
+            } else if (accounts[i].equals(account)) {
+                accounts[i] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int indexOf(Account account) {
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] == null) {
+                if (account == null) {
+                    return i;
+                }
+            } else if (accounts[i].equals(account)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
