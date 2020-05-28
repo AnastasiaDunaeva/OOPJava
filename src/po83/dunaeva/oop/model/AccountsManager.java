@@ -70,17 +70,18 @@ public class AccountsManager {
 
     public Account remove(int index) {
         Account removedAccount = accounts[index];
-        System.arraycopy(accounts, index, accounts, index + 1, size - index - 1);
+        System.arraycopy(accounts, index + 1, accounts, index, size - index - 1);
         accounts[size - index - 1] = null;
         return removedAccount;
     }
 
     public Account remove(long accountNumber) {
         for (int i = 0; i < size; i++) {
-            if (accounts[i] != null)
+            if (accounts[i] != null) {
                 if (accounts[i].getNumber() == accountNumber) {
                     return remove(i);
                 }
+            }
         }
         return null;
     }
@@ -92,6 +93,106 @@ public class AccountsManager {
     public Account[] getAccounts() {
         Account[] result = new Account[size()];
         System.arraycopy(accounts, 0, result, 0, size());
+        return result;
+    }
+
+    public Account[] getAccounts(ServiceTypes serviceType)
+    {
+        int newSize = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                if (accounts[i].getTariff() != null) {
+                    Service[] buffer = accounts[i].getTariff().getServices();
+                    for (int j = 0; j < buffer.length; j++) {
+                        if (buffer[j] != null) {
+                            if (buffer[j].getServiceType() == serviceType) {
+                                newSize++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Account[] result = new Account[newSize];
+
+        int destinationIndex = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                if (accounts[i].getTariff() != null) {
+                    Service[] buffer = accounts[i].getTariff().getServices();
+                    for (int j = 0; j < buffer.length; j++) {
+                        if (buffer[j] != null) {
+                            if (buffer[j].getServiceType() == serviceType) {
+                                result[destinationIndex] = accounts[i];
+                                destinationIndex++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Account[] getIndividualAccounts()
+    {
+        int newSize = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                if (accounts[i].getClass() == IndividualAccount.class) {
+                    newSize++;
+                }
+            }
+        }
+
+        Account[] result = new Account[newSize];
+
+        int destinationIndex = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                if (accounts[i].getClass() == IndividualAccount.class) {
+                    result[destinationIndex] = accounts[i];
+                    destinationIndex++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Account[] getEntityAccounts()
+    {
+        int newSize = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                if (accounts[i].getClass() == EntityAccount.class) {
+                    newSize++;
+                }
+            }
+        }
+
+        Account[] result = new Account[newSize];
+
+        int destinationIndex = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (accounts[i] != null) {
+                if (accounts[i].getClass() == EntityAccount.class) {
+                    result[destinationIndex] = accounts[i];
+                    destinationIndex++;
+                }
+            }
+        }
+
         return result;
     }
 

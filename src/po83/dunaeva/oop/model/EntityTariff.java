@@ -90,6 +90,42 @@ public class EntityTariff implements Tariff {
     }
 
     @Override
+    public Service[] getServices(ServiceTypes serviceType) {
+        if (head == null) {
+            return null;
+        }
+
+        int newSize = 0;
+
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            if (current.getValue() != null) {
+                if (current.getValue().getServiceType() == serviceType) {
+                    newSize++;
+                }
+            }
+            current = current.next;
+        }
+
+        Service[] services = new Service[newSize];
+
+        int destinationIndex = 0;
+
+        current = head;
+        for (int i = 0; i < size; i++) {
+            if (current.getValue() != null) {
+                if (current.getValue().getServiceType() == serviceType) {
+                    services[destinationIndex] = current.getValue();
+                    destinationIndex++;
+                }
+            }
+            current = current.next;
+        }
+
+        return services;
+    }
+
+    @Override
     public boolean hasService(String serviceName) {
         Node current = head;
         for (int i = 0; i < size; i++) {

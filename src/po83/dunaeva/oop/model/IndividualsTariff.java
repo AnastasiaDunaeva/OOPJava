@@ -57,10 +57,40 @@ public class IndividualsTariff implements Tariff{
         return null;
     }
 
+    @Override
+    public Service[] getServices(ServiceTypes serviceType) {
+        int newSize = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].getServiceType() == serviceType) {
+                    newSize++;
+                }
+            }
+        }
+
+        Service[] result = new Service[newSize];
+
+        int destinationIndex = 0;
+
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].getServiceType() == serviceType) {
+                    result[destinationIndex] = services[i];
+                    destinationIndex++;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public boolean hasService(String serviceName) {
         for (int i = 0; i < size; i++) {
-            if (services[i].getName().equals(serviceName)) {
-                return true;
+            if (services[i] != null) {
+                if (services[i].getName().equals(serviceName)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -74,15 +104,17 @@ public class IndividualsTariff implements Tariff{
 
     public Service remove(int index) {
         Service removedService = services[index];
-        System.arraycopy(services, index, services, index + 1, size - index - 1);
+        System.arraycopy(services, index + 1, services, index, size - index - 1);
         services[size - index - 1] = null;
         return removedService;
     }
 
     public Service remove(String serviceName) {
         for (int i = 0; i < size; i++) {
-            if (services[i].getName().equals(serviceName)) {
-                return remove(i);
+            if (services[i] != null) {
+                if (services[i].getName().equals(serviceName)) {
+                    return remove(i);
+                }
             }
         }
         return null;

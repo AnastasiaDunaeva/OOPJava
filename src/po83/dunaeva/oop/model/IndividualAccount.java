@@ -1,26 +1,20 @@
 package po83.dunaeva.oop.model;
 
-public class IndividualAccount implements Account {
-    private long number;
+public class IndividualAccount extends AbstractAccount {
     private Person person;
-    private Tariff tariff;
 
     public IndividualAccount(long number, Person person) {
-        this.number = number;
+        super(number, null);
         this.person = person;
-        tariff = new IndividualsTariff();
-        tariff.add(new Service("интернет 100мб\\сек", 300));
+
+        Tariff tariff = new IndividualsTariff();
+        tariff.add(new Service("интернет 100мб\\сек", 300, ServiceTypes.INTERNET));
+        setTariff(tariff);
     }
 
     public IndividualAccount(long number, Person person, Tariff tariff) {
-        this.number = number;
+        super(number, tariff);
         this.person = person;
-        this.tariff = tariff;
-    }
-
-    @Override
-    public long getNumber() {
-        return number;
     }
 
     public Person getPerson() {
@@ -29,15 +23,5 @@ public class IndividualAccount implements Account {
 
     public void setPerson(Person person) {
         this.person = person;
-    }
-
-    @Override
-    public void setTariff(Tariff tariff) {
-        this.tariff = tariff;
-    }
-
-    @Override
-    public Tariff getTariff() {
-        return tariff;
     }
 }

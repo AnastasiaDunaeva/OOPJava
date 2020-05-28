@@ -9,6 +9,8 @@ public interface Tariff {
 
     Service get(String serviceName);
 
+    Service[] getServices(ServiceTypes serviceType);
+
     boolean hasService(String serviceName);
 
     Service set(int index, Service service);
