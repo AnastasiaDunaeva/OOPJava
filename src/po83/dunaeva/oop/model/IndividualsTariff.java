@@ -1,6 +1,11 @@
 package po83.dunaeva.oop.model;
 
-public class IndividualsTariff implements Tariff{
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+public class IndividualsTariff implements Tariff, Cloneable{
     private int DEFAULT_SIZE = 8;
     private Service[] services;
     private int size;
@@ -16,12 +21,16 @@ public class IndividualsTariff implements Tariff{
     }
 
     public IndividualsTariff(Service[] services) {
+        Objects.requireNonNull(services, "массив пустой");
+
         size = services.length;
         this.services = new Service[size()];
         System.arraycopy(services, 0, this.services, 0, size());
     }
 
     public boolean add(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
         for (int i = 0; i < size(); i++) {
             if (services[i] == null) {
                 services[i] = service;
@@ -34,6 +43,12 @@ public class IndividualsTariff implements Tariff{
 
 
     public boolean add(int index, Service service) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
+        }
+
+        Objects.requireNonNull(service, "услуга пустая");
+
         if (services[index] == null) {
             services[index] = service;
             return true;
@@ -43,10 +58,16 @@ public class IndividualsTariff implements Tariff{
     }
 
     public Service get(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
+        }
+
         return services[index];
     }
 
     public Service get(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
         for (int i = 0; i < size; i++) {
             if (services[i] != null) {
                 if (services[i].getName().equals(serviceName)) {
@@ -54,11 +75,14 @@ public class IndividualsTariff implements Tariff{
                 }
             }
         }
-        return null;
+
+        throw new NoSuchElementException("Услуга не найдена");
     }
 
     @Override
     public Service[] getServices(ServiceTypes serviceType) {
+        Objects.requireNonNull(serviceType, "тип услуги пустой");
+
         int newSize = 0;
 
         for (int i = 0; i < size; i++) {
@@ -86,6 +110,8 @@ public class IndividualsTariff implements Tariff{
     }
 
     public boolean hasService(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
         for (int i = 0; i < size; i++) {
             if (services[i] != null) {
                 if (services[i].getName().equals(serviceName)) {
@@ -97,12 +123,22 @@ public class IndividualsTariff implements Tariff{
     }
 
     public Service set(int index, Service service) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
+        }
+
+        Objects.requireNonNull(service, "услуга пустая");
+
         Service changedService = services[index];
         services[index] = service;
         return changedService;
     }
 
     public Service remove(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
+        }
+
         Service removedService = services[index];
         System.arraycopy(services, index + 1, services, index, size - index - 1);
         services[size - index - 1] = null;
@@ -110,6 +146,8 @@ public class IndividualsTariff implements Tariff{
     }
 
     public Service remove(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
         for (int i = 0; i < size; i++) {
             if (services[i] != null) {
                 if (services[i].getName().equals(serviceName)) {
@@ -117,7 +155,51 @@ public class IndividualsTariff implements Tariff{
                 }
             }
         }
-        return null;
+
+        throw new NoSuchElementException("Услуга не найдена");
+    }
+
+    @Override
+    public boolean remove(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].equals(service)) {
+                    remove(i);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int indexOf(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                if (services[i].equals(service)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
+        for (int i = size - 1; i >= 0; i--) {
+            if (services[i] != null) {
+                if (services[i].equals(service)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     public int size() {
@@ -157,7 +239,13 @@ public class IndividualsTariff implements Tariff{
 
         for (int i = 0; i < size; ++i) {
             if (services[i] != null) {
-                result += services[i].getCost();
+                if (Period.between(services[i].getActivationDate(), LocalDate.now()).toTotalMonths() < 1) {
+                    result += services[i].getCost() *
+                            Period.between(services[i].getActivationDate(), LocalDate.now()).getDays() /
+                            LocalDate.now().lengthOfMonth();
+                } else {
+                    result += services[i].getCost();
+                }
             }
         }
 
@@ -169,5 +257,67 @@ public class IndividualsTariff implements Tariff{
         System.arraycopy(services, 0, result, 0, size());
         size *= 2;
         services = result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("services:");
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                result.append(String.format("\n%s", services[i]));
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 31;
+        for (int i = 0; i < size; i++) {
+            if (services[i] != null) {
+                result ^= services[i].hashCode();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (this.getClass() == o.getClass()) {
+            IndividualsTariff tariff = (IndividualsTariff) o;
+
+            boolean ok;
+            for (int i = 0; i < size; i++) {
+                ok = false;
+                for (int j = 0; j < tariff.size(); j++) {
+                    if (services[i] == null) {
+                        if (tariff.get(j) == null) {
+                            ok = true;
+                            break;
+                        }
+                    } else if (services[i].equals(tariff.get(j))) {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if (!ok) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Tariff clone() throws CloneNotSupportedException {
+        return new IndividualsTariff(services);
     }
 }
