@@ -1,6 +1,11 @@
 package po83.dunaeva.oop.model;
 
-public class EntityTariff implements Tariff {
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+public class EntityTariff implements Tariff, Cloneable {
     private Node head, tail;
     private int size;
 
@@ -10,6 +15,8 @@ public class EntityTariff implements Tariff {
     }
 
     public EntityTariff(Service[] services) {
+        Objects.requireNonNull(services, "массив пустой");
+
         head = new Node();
         size = 0;
         Node current = head;
@@ -25,6 +32,8 @@ public class EntityTariff implements Tariff {
 
     @Override
     public boolean add(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
         if (head == null) {
             head = new Node(service);
             tail = head;
@@ -39,9 +48,11 @@ public class EntityTariff implements Tariff {
 
     @Override
     public boolean add(int index, Service service) {
-        if (index >= size) {
-            return false;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
         }
+
+        Objects.requireNonNull(service, "услуга пустая");
 
         Node current = head;
         for (int i = 0; i < index; i++) {
@@ -64,8 +75,8 @@ public class EntityTariff implements Tariff {
 
     @Override
     public Service get(int index) {
-        if (index >= size) {
-            return null;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
         }
 
         Node current = head;
@@ -77,6 +88,8 @@ public class EntityTariff implements Tariff {
 
     @Override
     public Service get(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
         Node current = head;
         for (int i = 0; i < size; i++) {
             if (current.value != null) {
@@ -86,11 +99,14 @@ public class EntityTariff implements Tariff {
             }
             current = current.next;
         }
-        return null;
+
+        throw new NoSuchElementException("Услуга не найдена");
     }
 
     @Override
     public Service[] getServices(ServiceTypes serviceType) {
+        Objects.requireNonNull(serviceType, "тип услуги пустой");
+
         if (head == null) {
             return null;
         }
@@ -127,6 +143,8 @@ public class EntityTariff implements Tariff {
 
     @Override
     public boolean hasService(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
         Node current = head;
         for (int i = 0; i < size; i++) {
             if (current.value != null) {
@@ -141,9 +159,11 @@ public class EntityTariff implements Tariff {
 
     @Override
     public Service set(int index, Service service) {
-        if (index >= size) {
-            return null;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
         }
+
+        Objects.requireNonNull(service, "услуга пустая");
 
         Node current = head;
         for (int i = 0; i < index; i++) {
@@ -158,8 +178,8 @@ public class EntityTariff implements Tariff {
 
     @Override
     public Service remove(int index) {
-        if (index >= size) {
-            return null;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
         }
 
         Node current = head;
@@ -175,6 +195,8 @@ public class EntityTariff implements Tariff {
 
     @Override
     public Service remove(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
         Node current = head;
         for (int i = 0; i < size; i++) {
             current = current.next;
@@ -188,7 +210,60 @@ public class EntityTariff implements Tariff {
             }
         }
 
-        return null;
+        throw new NoSuchElementException("Услуга не найдена");
+    }
+
+    @Override
+    public boolean remove(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            current = current.next;
+            if (current.getValue() != null) {
+                if (current.getValue().equals(service)) {
+                    current.previous.next = current.next;
+                    current.next.previous = current.previous;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int indexOf(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            current = current.next;
+            if (current.getValue() != null) {
+                if (current.getValue().equals(service)) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Service service) {
+        Objects.requireNonNull(service, "услуга пустая");
+
+        Node current = tail;
+        for (int i = size - 1; i >= 0; i--) {
+            current = current.previous;
+            if (current.getValue() != null) {
+                if (current.getValue().equals(service)) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
     }
 
     @Override
@@ -257,7 +332,13 @@ public class EntityTariff implements Tariff {
         Node current = head;
         for (int i = 0; i < size; i++) {
             if (current.getValue() != null) {
-                cost += current.getValue().getCost();
+                if (Period.between(current.getValue().getActivationDate(), LocalDate.now()).toTotalMonths() < 1) {
+                    cost += current.getValue().getCost() *
+                            Period.between(current.getValue().getActivationDate(), LocalDate.now()).getDays() /
+                            LocalDate.now().lengthOfMonth();
+                } else {
+                    cost += current.getValue().getCost();
+                }
             }
             current = current.next;
         }
@@ -289,5 +370,68 @@ public class EntityTariff implements Tariff {
         public Service getValue() {
             return value;
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("services:");
+        for (int i = 0; i < size; i++) {
+            if (get(i) != null) {
+                result.append(String.format("\n%s", get(i)));
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 71;
+        for (int i = 0; i < size; i++) {
+            if (get(i) != null) {
+                result ^= get(i).hashCode();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (this.getClass() == o.getClass()) {
+            EntityTariff tariff = (EntityTariff) o;
+
+            boolean ok;
+            for (int i = 0; i < size; i++) {
+                ok = false;
+                for (int j = 0; j < tariff.size(); j++) {
+                    if (get(i) == null) {
+                        if (tariff.get(j) == null) {
+                            ok = true;
+                            break;
+                        }
+                    } else if (get(i).equals(tariff.get(j))) {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if (!ok) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Tariff clone() throws CloneNotSupportedException {
+        return new EntityTariff(getServices());
     }
 }
