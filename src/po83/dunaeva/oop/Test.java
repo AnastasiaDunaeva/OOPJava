@@ -2,150 +2,103 @@ package po83.dunaeva.oop;
 
 import po83.dunaeva.oop.model.*;
 
+import java.time.LocalDate;
+import java.util.Iterator;
+
 public class Test {
     public static void main(String[] args) {
-        lab3tests();
+        lab6tests();
 
         System.out.println("Я есть Грут!");
     }
 
-    private static void lab3tests() {
-        Person p1 = new Person();
-        Person p2 = new Person("Anastasia", "Dunaeva");
-        System.out.println(p1.getFirstName() + " " + p1.getSecondName());
-        System.out.println(p2.getFirstName() + " " + p2.getSecondName());
+    private static void lab6tests() {
+        try {
+            AccountsManager accountsManager = new AccountsManager(10);
+            Account a1 = new IndividualAccount(1000000000001L, new Person("Грут", "Грут"));
+            Account a2 = new IndividualAccount(999999999999999L, new Person("Грут", "Грут"), new IndividualsTariff(), LocalDate.now());
+            a1.getTariff().add(new Service());
+            a2.getTariff().add(new Service());
+            System.out.println(a1.equals(a2));
 
-        Service s1 = new Service();
-        Service s2 = new Service("интернет 150мб\\сек", 400, ServiceTypes.PHONE);
-        System.out.println(s1.getName() + " " + s1.getCost() + " " + s1.getServiceType());
-        System.out.println(s2.getName() + " " + s2.getCost() + " " + s2.getServiceType());
+            Account a3 = new EntityAccount(1000000000011L, "Anastasia");
+            a3.setTariff(new EntityTariff());
+            a3.getTariff().add(new Service("1", 10, ServiceTypes.MAIL, LocalDate.now()));
+            a3.getTariff().add(new Service("2", 20, ServiceTypes.PHONE, LocalDate.now()));
+            a3.getTariff().add(new Service("3", 30, ServiceTypes.STORAGE, LocalDate.now()));
+            System.out.println(a3.equals(a1));
+            System.out.println(a3);
 
-        Service[] services = new Service[3];
-        services[0] = s1;
-        services[1] = s2;
-        services[2] = new Service("s3", 500, ServiceTypes.STORAGE);
+            System.out.println();
 
-        Tariff t1 = new EntityTariff();
-        Tariff t2 = new IndividualsTariff(2);
-        Tariff t3 = new IndividualsTariff(services);
+            accountsManager.add(a1);
+            accountsManager.add(a2);
+            accountsManager.add(a3);
 
-        t1.add(new Service("s4", 4, ServiceTypes.ADDITIONAL_SERVICE));
-        t1.add(2, new Service("s5", 5, ServiceTypes.MAIL));
-        t3.add(new Service("s6", 6, ServiceTypes.INTERNET));
-        t2.set(1, t1.get(0));
-        t2.add(t1.get("s5"));
-        t3.remove(0);
-        t3.remove("s3");
-
-        Service[] buffer;
-        buffer = t1.getServices();
-        for (int i = 0; i < t1.size(); i++) {
-            if (buffer[i] != null) {
-                System.out.println(buffer[i].getName() + " " + buffer[i].getCost() + " " + buffer[i].getServiceType());
-            } else {
-                System.out.println("null");
+            for (Account account : accountsManager) {
+                System.out.println(account);
             }
-        }
 
-        System.out.println();
+            System.out.println();
 
-        buffer = t2.getServices();
-        for (int i = 0; i < t2.size(); i++) {
-            if (buffer[i] != null) {
-                System.out.println(buffer[i].getName() + " " + buffer[i].getCost() + " " + buffer[i].getServiceType());
-            } else {
-                System.out.println("null");
+            System.out.println(a2.getTariff().indexOf(new Service()));
+            System.out.println(a2.getTariff().remove(new Service()));
+            System.out.println(a2.getTariff().indexOf(new Service()));
+
+            System.out.println();
+
+            Account a4 = new EntityAccount(1000000000002L, "Ракета");
+            a4.getTariff().add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
+
+            System.out.println(a4.getTariff());
+
+            Service[] services = a4.getTariff().sortedServicesByCost();
+            for (int i = 0; i < services.length; i++) {
+                System.out.println(services[i]);
             }
-        }
 
-        System.out.println();
+            EntityTariff entityTariff = new EntityTariff();
+            entityTariff.add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
 
-        buffer = t3.getServices();
-        for (int i = 0; i < t3.size(); i++) {
-            if (buffer[i] != null) {
-                System.out.println(buffer[i].getName() + " " + buffer[i].getCost() + " " + buffer[i].getServiceType());
-            } else {
-                System.out.println("null");
+            System.out.println(a4.getTariff().lastIndexOf(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now())));
+
+            System.out.println();
+
+            Iterator<Service> iterator = entityTariff.iterator();
+            while (iterator.hasNext()) {
+                System.out.println(iterator.next());
             }
-        }
 
-        System.out.println();
+            System.out.println();
 
-        p1 = new Person("Грут", "");
-        Account a1 = new EntityAccount(1, "НеГрут");
-        System.out.println(a1.getNumber() + " " + ((EntityAccount) a1).getName() + " " + a1.getTariff().size());
-        Account a2 = new IndividualAccount(2, p2, t3);
-        System.out.println(a2.getNumber() + " " + ((IndividualAccount) a2).getPerson().getFirstName() + " " + a2.getTariff().size());
-        ((IndividualAccount) a2).setPerson(p1);
-        a2.setTariff(t2);
-        System.out.println(a2.getNumber() + " " + ((IndividualAccount) a2).getPerson().getFirstName() + " " + a2.getTariff().size());
-
-        System.out.println();
-
-        AccountsManager accountsManager = new AccountsManager(3);
-        accountsManager.add(a1);
-        accountsManager.set(2, a2);
-
-        System.out.println(accountsManager.get(2).getNumber());
-        System.out.println(accountsManager.remove(1L).getNumber());
-
-        System.out.println();
-
-        t1.add(new Service());
-        t1.add(new Service("M1", 10, ServiceTypes.MAIL));
-        t1.add(new Service("M2", 10, ServiceTypes.MAIL));
-        t1.add(new Service("M3", 10, ServiceTypes.MAIL));
-        t1.add(new Service("M4", 10, ServiceTypes.MAIL));
-        t1.add(new Service("P4", 10, ServiceTypes.PHONE));
-
-        services = t1.getServices(ServiceTypes.MAIL);
-        for (int i = 0; i < services.length; i++) {
-            System.out.println(services[i].getName() + " " + services[i].getCost() + " " + services[i].getServiceType());
-        }
-
-        System.out.println();
-
-        t2.add(new Service());
-        t2.add(new Service("M1", 10, ServiceTypes.MAIL));
-        t2.add(new Service("M2", 10, ServiceTypes.MAIL));
-        t2.add(new Service("M3", 10, ServiceTypes.MAIL));
-        t2.add(new Service("M4", 10, ServiceTypes.MAIL));
-        t2.add(new Service("P4", 10, ServiceTypes.PHONE));
-
-        services = t2.getServices(ServiceTypes.MAIL);
-        for (int i = 0; i < services.length; i++) {
-            System.out.println(services[i].getName() + " " + services[i].getCost() + " " + services[i].getServiceType());
-        }
-
-        System.out.println();
-
-        accountsManager.add(new EntityAccount(3, "Точно не Грут"));
-
-        Account[] accounts;
-
-        accounts = accountsManager.getAccounts();
-        for (int i = 0; i < accounts.length; i++) {
-            if (accounts[i] == null) {
-                System.out.println("null");
-            } else {
-                System.out.println(accounts[i].getNumber() + " " + accounts[i].getClass());
+            for (Service service : entityTariff) {
+                System.out.println(service);
             }
+
+            System.out.println();
+
+            IndividualsTariff individualsTariff = new IndividualsTariff();
+            individualsTariff.add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
+
+            for (Service service : individualsTariff) {
+                System.out.println(service);
+            }
+
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println();
-
-        accounts = accountsManager.getEntityAccounts();
-        for (int i = 0; i < accounts.length; i++) {
-            System.out.println(accounts[i].getNumber() + " " + ((EntityAccount)accounts[i]).getName() + " " + accounts[i].getClass());
-        }
-
-        System.out.println();
-
-        accounts = accountsManager.getIndividualAccounts();
-        for (int i = 0; i < accounts.length; i++) {
-            System.out.println(accounts[i].getNumber() + " " + ((IndividualAccount)accounts[i]).getPerson().getFirstName() + " " + accounts[i].getClass());
-        }
-
-        System.out.println();
     }
 }
