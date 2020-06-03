@@ -3,16 +3,17 @@ package po83.dunaeva.oop;
 import po83.dunaeva.oop.model.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Test {
     public static void main(String[] args) {
-        lab6tests();
+        lab7tests();
 
         System.out.println("Я есть Грут!");
     }
 
-    private static void lab6tests() {
+    private static void lab7tests() {
         try {
             AccountsManager accountsManager = new AccountsManager(10);
             Account a1 = new IndividualAccount(1000000000001L, new Person("Грут", "Грут"));
@@ -56,7 +57,7 @@ public class Test {
 
             System.out.println(a4.getTariff());
 
-            Service[] services = a4.getTariff().sortedServicesByCost();
+            Service[] services = a4.getTariff().sortedServicesByCost().toArray(Service[]::new);
             for (int i = 0; i < services.length; i++) {
                 System.out.println(services[i]);
             }
@@ -87,14 +88,24 @@ public class Test {
 
             IndividualsTariff individualsTariff = new IndividualsTariff();
             individualsTariff.add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
-            individualsTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("1", 5, ServiceTypes.INTERNET, LocalDate.now()));
             individualsTariff.add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
             individualsTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
             individualsTariff.add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
 
+            Service[] services1 = new Service[2];
+            services1[0] = new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now());
+            services1[1] =  new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now());
+
+            individualsTariff.retainAll(Arrays.asList(services1));
+
             for (Service service : individualsTariff) {
                 System.out.println(service);
             }
+
+            System.out.println(individualsTariff.isEmpty());
+            individualsTariff.clear();
+            System.out.println(individualsTariff.isEmpty());
 
             System.out.println();
         } catch (Exception e) {

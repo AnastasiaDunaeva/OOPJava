@@ -2,14 +2,32 @@ package po83.dunaeva.oop.model;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
-public interface Tariff extends Iterable<Service>{
+public interface Tariff extends Iterable<Service>, Collection<Service> {
     boolean add(Service service);
 
     boolean add(int index, Service service);
+
+    @Override
+    default boolean containsAll(Collection<?> c) {
+        for (Object o : c) {
+            boolean ok = false;
+            for (Service service : this) {
+                if (service.equals(o)) {
+                    ok = true;
+                    break;
+                }
+            }
+
+            if (ok) {
+                continue;
+            }
+
+            return false;
+        }
+        return true;
+    }
 
     Service get(int index);
 
@@ -27,7 +45,7 @@ public interface Tariff extends Iterable<Service>{
         throw new NoSuchElementException("Услуга не найдена");
     }
 
-    Service[] getServices(ServiceTypes serviceType);
+    Collection<Service> getServices(ServiceTypes serviceType);
 
     default boolean hasService(String serviceName) {
         Objects.requireNonNull(serviceName, "название услуги пустое");
@@ -35,6 +53,21 @@ public interface Tariff extends Iterable<Service>{
         for (Service service : this) {
             if (service != null) {
                 if (service.getName().equals(serviceName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    default boolean contains(Object o) {
+        Objects.requireNonNull(o, "объект пустой");
+
+        for (Service service : this) {
+            if (service != null) {
+                if (service.equals(o)) {
                     return true;
                 }
             }
@@ -63,13 +96,13 @@ public interface Tariff extends Iterable<Service>{
         throw new NoSuchElementException("Услуга не найдена");
     }
 
-    default boolean remove(Service service){
-        Objects.requireNonNull(service, "услуга пустая");
+    default boolean remove(Object o) {
+        Objects.requireNonNull(o, "услуга пустая");
 
         int index = 0;
         for (Service buffer : this) {
             if (buffer != null) {
-                if (buffer.equals(service)) {
+                if (buffer.equals(o)) {
                     remove(index);
                     return true;
                 }
@@ -80,7 +113,7 @@ public interface Tariff extends Iterable<Service>{
         return false;
     }
 
-    default int indexOf(Service service){
+    default int indexOf(Service service) {
         Objects.requireNonNull(service, "услуга пустая");
 
         int index = 0;
@@ -99,11 +132,12 @@ public interface Tariff extends Iterable<Service>{
 
     int size();
 
-    default Service[] getServices() {
+    @Override
+    default Object[] toArray() {
         Service[] result = new Service[size()];
 
         int index = 0;
-        for (Service service: this) {
+        for (Service service : this) {
             result[index] = service;
             index++;
         }
@@ -111,26 +145,21 @@ public interface Tariff extends Iterable<Service>{
         return result;
     }
 
-    default Service[] sortedServicesByCost() {
-        int newSize = 0;
+    @Override
+    default <T> T[] toArray(T[] a) {
+        return (T[])toArray();
+    }
+
+    default List<Service> sortedServicesByCost() {
+        ArrayList<Service> result = new ArrayList<>();
 
         for (Service service : this) {
             if (service != null) {
-                newSize++;
+                result.add(service);
             }
         }
 
-        Service[] result = new Service[newSize];
-
-        int destinationIndex = 0;
-        for (Service service : this) {
-            if (service != null) {
-                result[destinationIndex] = service;
-                destinationIndex++;
-            }
-        }
-
-        Arrays.sort(result);
+        result.sort(Service::compareTo);
 
         return result;
     }

@@ -1,8 +1,6 @@
 package po83.dunaeva.oop.model;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 public class EntityTariff implements Tariff, Cloneable {
     private Node head, tail;
@@ -43,6 +41,69 @@ public class EntityTariff implements Tariff, Cloneable {
         }
         size++;
         return true;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Service> c) {
+        for (Object o : c) {
+            for (int i = 0; i < size; i++) {
+                add((Service) o);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean result = false;
+        for (Object o : c) {
+            Node current = head;
+            for (int i = 0; i < size; i++) {
+                if (current.value != null) {
+                    if (current.value.equals(o)) {
+                        remove(i);
+                        result = true;
+                        break;
+                    }
+                }
+                current = current.next;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean result = false;
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            boolean ok = false;
+            for (Object o : c) {
+                if (current.value != null) {
+                    if (current.value.equals(o)) {
+                        ok = true;
+                        break;
+                    }
+                }
+            }
+
+            current = current.next;
+
+            if (ok) {
+                continue;
+            }
+
+            remove(i);
+            result = true;
+        }
+        return result;
+    }
+
+    @Override
+    public void clear() {
+        while (!isEmpty()) {
+            remove(0);
+        }
     }
 
     @Override
@@ -87,30 +148,16 @@ public class EntityTariff implements Tariff, Cloneable {
     }
 
     @Override
-    public Service[] getServices(ServiceTypes serviceType) {
+    public Collection<Service> getServices(ServiceTypes serviceType) {
         Objects.requireNonNull(serviceType, "тип услуги пустой");
 
-        int newSize = 0;
+        LinkedList<Service> result = new LinkedList<>();
 
         Node current = head;
         for (int i = 0; i < size; i++) {
             if (current.value != null) {
                 if (current.value.getServiceType() == serviceType) {
-                    newSize++;
-                }
-            }
-        }
-
-        Service[] result = new Service[newSize];
-
-        int destinationIndex = 0;
-
-        current = head;
-        for (int i = 0; i < size; i++) {
-            if (current.value != null) {
-                if (current.value.getServiceType() == serviceType) {
-                    result[destinationIndex] = current.value;
-                    destinationIndex++;
+                    result.add(current.value);
                 }
             }
         }
@@ -174,6 +221,11 @@ public class EntityTariff implements Tariff, Cloneable {
     @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     @Override
@@ -289,6 +341,6 @@ public class EntityTariff implements Tariff, Cloneable {
 
     @Override
     public Tariff clone() throws CloneNotSupportedException {
-        return new EntityTariff(getServices());
+        return new EntityTariff((Service[]) toArray());
     }
 }
