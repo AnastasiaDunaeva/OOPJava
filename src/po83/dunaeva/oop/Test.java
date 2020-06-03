@@ -3,15 +3,16 @@ package po83.dunaeva.oop;
 import po83.dunaeva.oop.model.*;
 
 import java.time.LocalDate;
+import java.util.Iterator;
 
 public class Test {
     public static void main(String[] args) {
-        lab5tests();
+        lab6tests();
 
         System.out.println("Я есть Грут!");
     }
 
-    private static void lab5tests() {
+    private static void lab6tests() {
         try {
             AccountsManager accountsManager = new AccountsManager(10);
             Account a1 = new IndividualAccount(1000000000001L, new Person("Грут", "Грут"));
@@ -28,12 +29,17 @@ public class Test {
             System.out.println(a3.equals(a1));
             System.out.println(a3);
 
+            System.out.println();
+
             accountsManager.add(a1);
             accountsManager.add(a2);
             accountsManager.add(a3);
 
-            System.out.println(accountsManager.remove(a2));
-            System.out.println(accountsManager.indexOf(a3));
+            for (Account account : accountsManager) {
+                System.out.println(account);
+            }
+
+            System.out.println();
 
             System.out.println(a2.getTariff().indexOf(new Service()));
             System.out.println(a2.getTariff().remove(new Service()));
@@ -42,14 +48,56 @@ public class Test {
             System.out.println();
 
             Account a4 = new EntityAccount(1000000000002L, "Ракета");
-            a4.getTariff().add(new Service("2", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
             a4.getTariff().add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
-            a4.getTariff().add(new Service("2", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
             a4.getTariff().add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
-            a4.getTariff().add(new Service("2", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            a4.getTariff().add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
 
-            System.out.println(a4.getTariff().lastIndexOf(new Service("2", 10, ServiceTypes.INTERNET, LocalDate.now())));
-        } catch (Exception e){
+            System.out.println(a4.getTariff());
+
+            Service[] services = a4.getTariff().sortedServicesByCost();
+            for (int i = 0; i < services.length; i++) {
+                System.out.println(services[i]);
+            }
+
+            EntityTariff entityTariff = new EntityTariff();
+            entityTariff.add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            entityTariff.add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
+
+            System.out.println(a4.getTariff().lastIndexOf(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now())));
+
+            System.out.println();
+
+            Iterator<Service> iterator = entityTariff.iterator();
+            while (iterator.hasNext()) {
+                System.out.println(iterator.next());
+            }
+
+            System.out.println();
+
+            for (Service service : entityTariff) {
+                System.out.println(service);
+            }
+
+            System.out.println();
+
+            IndividualsTariff individualsTariff = new IndividualsTariff();
+            individualsTariff.add(new Service("2", 20, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("2", 30, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("1", 10, ServiceTypes.INTERNET, LocalDate.now()));
+            individualsTariff.add(new Service("2", 5, ServiceTypes.INTERNET, LocalDate.now()));
+
+            for (Service service : individualsTariff) {
+                System.out.println(service);
+            }
+
+            System.out.println();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }

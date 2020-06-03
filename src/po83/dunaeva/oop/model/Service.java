@@ -3,7 +3,7 @@ package po83.dunaeva.oop.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public final class Service implements Cloneable {
+public final class Service implements Cloneable, Comparable<Service> {
     final private String DEFAULT_NAME = "интернет 100мб\\сек";
     final private double DEFAULT_COST = 300;
     final private String name;
@@ -82,5 +82,14 @@ public final class Service implements Cloneable {
     @Override
     public Service clone() throws CloneNotSupportedException {
         return new Service(name, cost, serviceType, activationDate);
+    }
+
+    @Override
+    public int compareTo(Service o) {
+        if (o == null) {
+            return 1;
+        }
+
+        return Double.compare(cost, o.cost);
     }
 }

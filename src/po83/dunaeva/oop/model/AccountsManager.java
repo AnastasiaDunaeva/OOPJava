@@ -1,9 +1,10 @@
 package po83.dunaeva.oop.model;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class AccountsManager {
+public class AccountsManager implements Iterable<Account> {
     private int DEFAULT_SIZE = 8;
     private Account[] accounts;
     private int size;
@@ -78,10 +79,10 @@ public class AccountsManager {
             throw new IllegalAccountNumber("номер не соответствует формату");
         }
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getNumber() == accountNumber) {
-                    return accounts[i];
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getNumber() == accountNumber) {
+                    return account;
                 }
             }
         }
@@ -167,13 +168,13 @@ public class AccountsManager {
 
         int newSize = 0;
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getTariff() != null) {
-                    Service[] buffer = accounts[i].getTariff().getServices();
-                    for (int j = 0; j < buffer.length; j++) {
-                        if (buffer[j] != null) {
-                            if (buffer[j].getServiceType() == serviceType) {
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getTariff() != null) {
+                    Service[] buffer = account.getTariff().getServices();
+                    for (Service service : buffer) {
+                        if (service != null) {
+                            if (service.getServiceType() == serviceType) {
                                 newSize++;
                                 break;
                             }
@@ -187,14 +188,14 @@ public class AccountsManager {
 
         int destinationIndex = 0;
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getTariff() != null) {
-                    Service[] buffer = accounts[i].getTariff().getServices();
-                    for (int j = 0; j < buffer.length; j++) {
-                        if (buffer[j] != null) {
-                            if (buffer[j].getServiceType() == serviceType) {
-                                result[destinationIndex] = accounts[i];
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getTariff() != null) {
+                    Service[] buffer = account.getTariff().getServices();
+                    for (Service service : buffer) {
+                        if (service != null) {
+                            if (service.getServiceType() == serviceType) {
+                                result[destinationIndex] = account;
                                 destinationIndex++;
                                 break;
                             }
@@ -207,12 +208,38 @@ public class AccountsManager {
         return result;
     }
 
+    public Account[] getAccounts(String serviceName) {
+        int newSize = 0;
+
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getTariff().hasService(serviceName)) {
+                    newSize++;
+                }
+            }
+        }
+
+        Account[] result = new Account[newSize];
+
+        int destinationIndex = 0;
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getTariff().hasService(serviceName)) {
+                    result[destinationIndex] = account;
+                    destinationIndex++;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public Account[] getIndividualAccounts() {
         int newSize = 0;
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getClass() == IndividualAccount.class) {
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getClass() == IndividualAccount.class) {
                     newSize++;
                 }
             }
@@ -222,10 +249,10 @@ public class AccountsManager {
 
         int destinationIndex = 0;
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getClass() == IndividualAccount.class) {
-                    result[destinationIndex] = accounts[i];
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getClass() == IndividualAccount.class) {
+                    result[destinationIndex] = account;
                     destinationIndex++;
                 }
             }
@@ -237,9 +264,9 @@ public class AccountsManager {
     public Account[] getEntityAccounts() {
         int newSize = 0;
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getClass() == EntityAccount.class) {
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getClass() == EntityAccount.class) {
                     newSize++;
                 }
             }
@@ -249,10 +276,10 @@ public class AccountsManager {
 
         int destinationIndex = 0;
 
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getClass() == EntityAccount.class) {
-                    result[destinationIndex] = accounts[i];
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getClass() == EntityAccount.class) {
+                    result[destinationIndex] = account;
                     destinationIndex++;
                 }
             }
@@ -266,10 +293,10 @@ public class AccountsManager {
             throw new IllegalAccountNumber("номер не соответствует формату");
         }
 
-        for (int i = 0; i < accountNumber; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getNumber() == accountNumber) {
-                    return accounts[i].getTariff();
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getNumber() == accountNumber) {
+                    return account.getTariff();
                 }
             }
         }
@@ -285,21 +312,17 @@ public class AccountsManager {
         Objects.requireNonNull(tariff, "тариф пустой");
 
         Tariff result = null;
-        for (int i = 0; i < accountNumber; i++) {
-            if (accounts[i] != null) {
-                if (accounts[i].getNumber() == accountNumber) {
-                    result = accounts[i].getTariff();
-                    accounts[i].setTariff(tariff);
-                    break;
+        for (Account account : this) {
+            if (account != null) {
+                if (account.getNumber() == accountNumber) {
+                    result = account.getTariff();
+                    account.setTariff(tariff);
+                    return result;
                 }
             }
         }
 
-        if (result == null){
-            throw new NoSuchElementException("элемент не найден");
-        }
-
-        return result;
+        throw new NoSuchElementException("элемент не найден");
     }
 
     private void doubleArraySize() {
@@ -349,5 +372,28 @@ public class AccountsManager {
             }
         }
         return -1;
+    }
+
+    @Override
+    public Iterator<Account> iterator() {
+        return new AccountIterator();
+    }
+
+    private class AccountIterator implements Iterator<Account> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size() - 1;
+        }
+
+        @Override
+        public Account next() {
+            if (hasNext()) {
+                return get(index++);
+            } else {
+                throw new NoSuchElementException("итератор не нашёл следующий элемент");
+            }
+        }
     }
 }
