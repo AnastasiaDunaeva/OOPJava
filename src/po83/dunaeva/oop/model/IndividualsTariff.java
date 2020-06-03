@@ -1,11 +1,10 @@
 package po83.dunaeva.oop.model;
 
-import java.time.LocalDate;
-import java.time.Period;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class IndividualsTariff implements Tariff, Cloneable{
+public class IndividualsTariff implements Tariff, Cloneable {
     private int DEFAULT_SIZE = 8;
     private Service[] services;
     private int size;
@@ -57,26 +56,13 @@ public class IndividualsTariff implements Tariff, Cloneable{
         }
     }
 
+    @Override
     public Service get(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
         }
 
         return services[index];
-    }
-
-    public Service get(String serviceName) {
-        Objects.requireNonNull(serviceName, "название услуги пустое");
-
-        for (int i = 0; i < size; i++) {
-            if (services[i] != null) {
-                if (services[i].getName().equals(serviceName)) {
-                    return services[i];
-                }
-            }
-        }
-
-        throw new NoSuchElementException("Услуга не найдена");
     }
 
     @Override
@@ -109,19 +95,6 @@ public class IndividualsTariff implements Tariff, Cloneable{
         return result;
     }
 
-    public boolean hasService(String serviceName) {
-        Objects.requireNonNull(serviceName, "название услуги пустое");
-
-        for (int i = 0; i < size; i++) {
-            if (services[i] != null) {
-                if (services[i].getName().equals(serviceName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public Service set(int index, Service service) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("индекс вне допустимого диапозона");
@@ -145,49 +118,6 @@ public class IndividualsTariff implements Tariff, Cloneable{
         return removedService;
     }
 
-    public Service remove(String serviceName) {
-        Objects.requireNonNull(serviceName, "название услуги пустое");
-
-        for (int i = 0; i < size; i++) {
-            if (services[i] != null) {
-                if (services[i].getName().equals(serviceName)) {
-                    return remove(i);
-                }
-            }
-        }
-
-        throw new NoSuchElementException("Услуга не найдена");
-    }
-
-    @Override
-    public boolean remove(Service service) {
-        Objects.requireNonNull(service, "услуга пустая");
-
-        for (int i = 0; i < size; i++) {
-            if (services[i] != null) {
-                if (services[i].equals(service)) {
-                    remove(i);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int indexOf(Service service) {
-        Objects.requireNonNull(service, "услуга пустая");
-
-        for (int i = 0; i < size; i++) {
-            if (services[i] != null) {
-                if (services[i].equals(service)) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     @Override
     public int lastIndexOf(Service service) {
         Objects.requireNonNull(service, "услуга пустая");
@@ -204,52 +134,6 @@ public class IndividualsTariff implements Tariff, Cloneable{
 
     public int size() {
         return size;
-    }
-
-    public Service[] getServices() {
-        Service[] result = new Service[size()];
-        System.arraycopy(services, 0, result, 0, size());
-        return result;
-    }
-
-    public Service[] sortedServicesByCost() {
-        Service[] result = new Service[size()];
-        System.arraycopy(services, 0, result, 0, size());
-        boolean isSorted = false;
-        Service buffer;
-        while (!isSorted) {
-            isSorted = true;
-            for (int i = 0; i < size; i++) {
-                if (result[i] != null) {
-                    if (result[i].getCost() > result[i + 1].getCost()) {
-                        isSorted = false;
-
-                        buffer = result[i];
-                        result[i] = result[i + 1];
-                        result[i + 1] = buffer;
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public double cost() {
-        double result = 0;
-
-        for (int i = 0; i < size; ++i) {
-            if (services[i] != null) {
-                if (Period.between(services[i].getActivationDate(), LocalDate.now()).toTotalMonths() < 1) {
-                    result += services[i].getCost() *
-                            Period.between(services[i].getActivationDate(), LocalDate.now()).getDays() /
-                            LocalDate.now().lengthOfMonth();
-                } else {
-                    result += services[i].getCost();
-                }
-            }
-        }
-
-        return result;
     }
 
     private void doubleArraySize() {
@@ -319,5 +203,28 @@ public class IndividualsTariff implements Tariff, Cloneable{
 
     public Tariff clone() throws CloneNotSupportedException {
         return new IndividualsTariff(services);
+    }
+
+    @Override
+    public Iterator<Service> iterator() {
+        return new ServiceIterator();
+    }
+
+    private class ServiceIterator implements Iterator<Service> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size() - 1;
+        }
+
+        @Override
+        public Service next() {
+            if (hasNext()) {
+                return get(index++);
+            } else {
+                throw new NoSuchElementException("итератор не нашёл следующий элемент");
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 package po83.dunaeva.oop.model;
 
-import java.time.LocalDate;
-import java.time.Period;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -83,78 +82,40 @@ public class EntityTariff implements Tariff, Cloneable {
         for (int i = 0; i < index; i++) {
             current = current.next;
         }
+
         return current.value;
-    }
-
-    @Override
-    public Service get(String serviceName) {
-        Objects.requireNonNull(serviceName, "название услуги пустое");
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            if (current.value != null) {
-                if (current.value.getName().equals(serviceName)) {
-                    return current.value;
-                }
-            }
-            current = current.next;
-        }
-
-        throw new NoSuchElementException("Услуга не найдена");
     }
 
     @Override
     public Service[] getServices(ServiceTypes serviceType) {
         Objects.requireNonNull(serviceType, "тип услуги пустой");
 
-        if (head == null) {
-            return null;
-        }
-
         int newSize = 0;
 
         Node current = head;
         for (int i = 0; i < size; i++) {
-            if (current.getValue() != null) {
-                if (current.getValue().getServiceType() == serviceType) {
+            if (current.value != null) {
+                if (current.value.getServiceType() == serviceType) {
                     newSize++;
                 }
             }
-            current = current.next;
         }
 
-        Service[] services = new Service[newSize];
+        Service[] result = new Service[newSize];
 
         int destinationIndex = 0;
 
         current = head;
         for (int i = 0; i < size; i++) {
-            if (current.getValue() != null) {
-                if (current.getValue().getServiceType() == serviceType) {
-                    services[destinationIndex] = current.getValue();
+            if (current.value != null) {
+                if (current.value.getServiceType() == serviceType) {
+                    result[destinationIndex] = current.value;
                     destinationIndex++;
                 }
             }
-            current = current.next;
         }
 
-        return services;
-    }
-
-    @Override
-    public boolean hasService(String serviceName) {
-        Objects.requireNonNull(serviceName, "название услуги пустое");
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            if (current.value != null) {
-                if (current.value.getName().equals(serviceName)) {
-                    return true;
-                }
-            }
-            current = current.next;
-        }
-        return false;
+        return result;
     }
 
     @Override
@@ -194,62 +155,6 @@ public class EntityTariff implements Tariff, Cloneable {
     }
 
     @Override
-    public Service remove(String serviceName) {
-        Objects.requireNonNull(serviceName, "название услуги пустое");
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            current = current.next;
-            if (current.getValue() != null) {
-                if (current.getValue().getName().equals(serviceName)) {
-                    current.previous.next = current.next;
-                    current.next.previous = current.previous;
-
-                    return current.getValue();
-                }
-            }
-        }
-
-        throw new NoSuchElementException("Услуга не найдена");
-    }
-
-    @Override
-    public boolean remove(Service service) {
-        Objects.requireNonNull(service, "услуга пустая");
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            current = current.next;
-            if (current.getValue() != null) {
-                if (current.getValue().equals(service)) {
-                    current.previous.next = current.next;
-                    current.next.previous = current.previous;
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public int indexOf(Service service) {
-        Objects.requireNonNull(service, "услуга пустая");
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            current = current.next;
-            if (current.getValue() != null) {
-                if (current.getValue().equals(service)) {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
-    }
-
-    @Override
     public int lastIndexOf(Service service) {
         Objects.requireNonNull(service, "услуга пустая");
 
@@ -272,78 +177,30 @@ public class EntityTariff implements Tariff, Cloneable {
     }
 
     @Override
-    public Service[] getServices() {
-        if (head == null) {
-            return null;
-        }
-
-        Service[] services = new Service[size];
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            services[i] = current.getValue();
-            current = current.next;
-        }
-
-        return services;
+    public Iterator<Service> iterator() {
+        return new ServiceIterator();
     }
 
-    @Override
-    public Service[] sortedServicesByCost() {
-        if (head == null) {
-            return null;
+    private class ServiceIterator implements Iterator<Service> {
+        private Node current = head;
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size() - 1;
         }
 
-        Service[] services = new Service[size];
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            services[i] = current.getValue();
-            current = current.next;
-        }
-
-        Service buffer;
-        boolean isSorted = false;
-
-        while (!isSorted) {
-            for (int i = 0; i < services.length - 1; i++) {
-                isSorted = true;
-                if (services[i].getCost() > services[i + 1].getCost()) {
-                    isSorted = false;
-
-                    buffer = services[i];
-                    services[i] = services[i + 1];
-                    services[i + 1] = buffer;
-                }
+        @Override
+        public Service next() {
+            if (hasNext()) {
+                Service result = current.getValue();
+                current = current.next;
+                index++;
+                return result;
+            } else {
+                throw new NoSuchElementException("итератор не нашёл следующий элемент");
             }
         }
-
-        return services;
-    }
-
-    @Override
-    public double cost() {
-        if (head == null) {
-            return 0;
-        }
-
-        double cost = 0;
-
-        Node current = head;
-        for (int i = 0; i < size; i++) {
-            if (current.getValue() != null) {
-                if (Period.between(current.getValue().getActivationDate(), LocalDate.now()).toTotalMonths() < 1) {
-                    cost += current.getValue().getCost() *
-                            Period.between(current.getValue().getActivationDate(), LocalDate.now()).getDays() /
-                            LocalDate.now().lengthOfMonth();
-                } else {
-                    cost += current.getValue().getCost();
-                }
-            }
-            current = current.next;
-        }
-
-        return cost;
     }
 
     private class Node {
