@@ -1,8 +1,6 @@
 package po83.dunaeva.oop.model;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 public class AccountsManager implements Iterable<Account> {
     private int DEFAULT_SIZE = 8;
@@ -163,40 +161,19 @@ public class AccountsManager implements Iterable<Account> {
         return result;
     }
 
-    public Account[] getAccounts(ServiceTypes serviceType) {
+    public Set<Account> getAccounts(ServiceTypes serviceType) {
         Objects.requireNonNull(serviceType, "тип аккаунта пустой");
 
-        int newSize = 0;
+        HashSet<Account> result = new HashSet<>();
 
         for (Account account : this) {
             if (account != null) {
                 if (account.getTariff() != null) {
-                    Service[] buffer = account.getTariff().getServices();
+                    Service[] buffer = (Service[]) account.getTariff().toArray();
                     for (Service service : buffer) {
                         if (service != null) {
                             if (service.getServiceType() == serviceType) {
-                                newSize++;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Account[] result = new Account[newSize];
-
-        int destinationIndex = 0;
-
-        for (Account account : this) {
-            if (account != null) {
-                if (account.getTariff() != null) {
-                    Service[] buffer = account.getTariff().getServices();
-                    for (Service service : buffer) {
-                        if (service != null) {
-                            if (service.getServiceType() == serviceType) {
-                                result[destinationIndex] = account;
-                                destinationIndex++;
+                                result.add(account);
                                 break;
                             }
                         }
@@ -208,25 +185,15 @@ public class AccountsManager implements Iterable<Account> {
         return result;
     }
 
-    public Account[] getAccounts(String serviceName) {
-        int newSize = 0;
+    public Set<Account> getAccounts(String serviceName) {
+        Objects.requireNonNull(serviceName, "название услуги пустое");
+
+        HashSet<Account> result = new HashSet<>();
 
         for (Account account : this) {
             if (account != null) {
                 if (account.getTariff().hasService(serviceName)) {
-                    newSize++;
-                }
-            }
-        }
-
-        Account[] result = new Account[newSize];
-
-        int destinationIndex = 0;
-        for (Account account : this) {
-            if (account != null) {
-                if (account.getTariff().hasService(serviceName)) {
-                    result[destinationIndex] = account;
-                    destinationIndex++;
+                    result.add(account);
                 }
             }
         }
@@ -234,26 +201,13 @@ public class AccountsManager implements Iterable<Account> {
         return result;
     }
 
-    public Account[] getIndividualAccounts() {
-        int newSize = 0;
+    public List<Account> getIndividualAccounts() {
+        ArrayList<Account> result = new ArrayList<>();
 
         for (Account account : this) {
             if (account != null) {
                 if (account.getClass() == IndividualAccount.class) {
-                    newSize++;
-                }
-            }
-        }
-
-        Account[] result = new Account[newSize];
-
-        int destinationIndex = 0;
-
-        for (Account account : this) {
-            if (account != null) {
-                if (account.getClass() == IndividualAccount.class) {
-                    result[destinationIndex] = account;
-                    destinationIndex++;
+                    result.add(account);
                 }
             }
         }
@@ -261,26 +215,13 @@ public class AccountsManager implements Iterable<Account> {
         return result;
     }
 
-    public Account[] getEntityAccounts() {
-        int newSize = 0;
+    public List<Account>  getEntityAccounts() {
+        LinkedList<Account> result = new LinkedList<>();
 
         for (Account account : this) {
             if (account != null) {
                 if (account.getClass() == EntityAccount.class) {
-                    newSize++;
-                }
-            }
-        }
-
-        Account[] result = new Account[newSize];
-
-        int destinationIndex = 0;
-
-        for (Account account : this) {
-            if (account != null) {
-                if (account.getClass() == EntityAccount.class) {
-                    result[destinationIndex] = account;
-                    destinationIndex++;
+                    result.add(account);
                 }
             }
         }

@@ -1,8 +1,6 @@
 package po83.dunaeva.oop.model;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 public class IndividualsTariff implements Tariff, Cloneable {
     private int DEFAULT_SIZE = 8;
@@ -40,6 +38,71 @@ public class IndividualsTariff implements Tariff, Cloneable {
         return add(service);
     }
 
+    @Override
+    public boolean addAll(Collection<? extends Service> c) {
+        for (Object o : c) {
+            for (int i = 0; i < size; i++) {
+                if (services[i] == null) {
+                    services[i] = (Service) o;
+                    break;
+                }
+
+                if (i == size - 1) {
+                    doubleArraySize();
+                    i--;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean result = false;
+        for (Object o : c) {
+            for (int i = 0; i < size; i++) {
+                if (services[i] != null) {
+                    if (services[i].equals(o)) {
+                        services[i] = null;
+                        result = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean result = false;
+            for (int i = 0; i < size; i++) {
+                boolean ok = false;
+                for (Object o : c) {
+                    if (services[i] != null) {
+                        if (services[i].equals(o)) {
+                            ok = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (ok) {
+                    continue;
+                }
+
+                services[i] = null;
+                result = true;
+            }
+        return result;
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < size; i++) {
+            services[i] = null;
+        }
+    }
 
     public boolean add(int index, Service service) {
         if (index < 0 || index >= size) {
@@ -66,28 +129,15 @@ public class IndividualsTariff implements Tariff, Cloneable {
     }
 
     @Override
-    public Service[] getServices(ServiceTypes serviceType) {
+    public Collection<Service> getServices(ServiceTypes serviceType) {
         Objects.requireNonNull(serviceType, "тип услуги пустой");
 
-        int newSize = 0;
+        LinkedList<Service> result = new LinkedList<>();
 
         for (int i = 0; i < size; i++) {
             if (services[i] != null) {
                 if (services[i].getServiceType() == serviceType) {
-                    newSize++;
-                }
-            }
-        }
-
-        Service[] result = new Service[newSize];
-
-        int destinationIndex = 0;
-
-        for (int i = 0; i < size; i++) {
-            if (services[i] != null) {
-                if (services[i].getServiceType() == serviceType) {
-                    result[destinationIndex] = services[i];
-                    destinationIndex++;
+                    result.add(services[i]);
                 }
             }
         }
@@ -132,8 +182,19 @@ public class IndividualsTariff implements Tariff, Cloneable {
         return -1;
     }
 
+    @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (Service service : this) {
+            if (service != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void doubleArraySize() {
